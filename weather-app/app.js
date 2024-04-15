@@ -1,19 +1,29 @@
-const request = require('request')
+const geocode = require('./utils/geocode')
+const forecast = require('./utils/forecast') 
 
-const url ="http://api.weatherapi.com/v1/current.json?key=fc0f00473c37468cb0f63135241204&q=Delhi&aqi=no"
+const location = process.argv[2]
 
-request({
-    url : url,
-    json: true
-}, (error, response) => {
+if(location) {
+    geocode(location, (error, {lat, long, location} = {}) => {
+        if(error) {
+            console.log("Some error occured. ", error)
+        } else {
+            console.log(location)
+            forecast({lat,long}, (error, data) => {
+                if(error) {
+                    console.log("Some error occured. ", error)
+                } else {
+                    console.log(data.condition.text+". It is currently "+ data.temp_c+" degrees out and feels like "+data.feelslike_c +" degree")
+                }
+            })
+            
+        }
+    })
+    
+} else {
+    console.log("Location not found")
+}
 
-    const data = (response.body.current)
-   
 
-    console.log(data.condition.text+". It is currently "+ data.temp_c+" degrees out and feels like "+data.feelslike_c +" degree")
-
-})
-
-// Geocoding
 
 
